@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import urllib2
 import time
+from collections import defaultdict
 from bs4 import BeautifulSoup
 
 
@@ -20,7 +21,7 @@ def extraer_articulos(conicet_id):
 def info_articulos(url):
     response = urllib2.urlopen(url)
     html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, 'html.parser', from_encoding='utf-8')
     labels = soup.find_all('div', attrs={"class": "contenido_label"})
     info = soup.find_all('div', attrs={"class": "contenido_label_info"})
     if len(labels) != len(info):
@@ -218,6 +219,12 @@ def datos_persona(id_conicet):
         time.sleep(1)
     return datos_arts, datos_lib, datos_caps, datos_congr, datos_conv, datos_inftec
     
+    
+def transformaroutput(dictlist):
+    output = defaultdict(list)
+    for i in dictlist:
+        output[i['anio']].append(i['Resumen:'])
+    return output
     
 
 
