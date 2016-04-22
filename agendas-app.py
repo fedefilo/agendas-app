@@ -3,7 +3,7 @@ import urllib2
 import time
 from collections import defaultdict
 from bs4 import BeautifulSoup
-
+from nltk.text import TextCollection
 
 def extraer_articulos(conicet_id):
     url_art = "http://www.conicet.gov.ar/new_scp/detalle.php?keywords=&id=" + str(conicet_id) + "&articulos=yes"
@@ -217,14 +217,32 @@ def datos_persona(id_conicet):
         dict_inftec = info_inftec(url)
         datos_inftec.append(dict_inftec)
         time.sleep(1)
-    return datos_arts, datos_lib, datos_caps, datos_congr, datos_conv, datos_inftec
+    return [transformaroutput(datos_arts), transformaroutput(datos_lib), transformaroutput(datos_caps), transformaroutput(datos_congr), transformaroutput(datos_conv), transformaroutput(datos_inftec)]
     
     
 def transformaroutput(dictlist):
     output = defaultdict(list)
     for i in dictlist:
-        output[i['anio']].append(i['Resumen:'])
+        if i['anio'].endswith(';'):
+            i['anio'] = i['anio'][:-1]
+        try:
+            output[i['anio']].append(i['Resumen:'])
+        except KeyError:
+            output[i['anio']].append(i[u'Descripción:'])
+        
     return output
     
 
-
+def juntarlistas(listas):
+    output = {}
+    for lista in listas:
+        for i, j in lista.iteritems():
+            if i not in output.keys():
+                output[i] = []
+            if type(j) is list:
+                for k in j:
+                   output[i].append(k)  
+            else:
+                output[i].append(j)
+    return output 
+    
