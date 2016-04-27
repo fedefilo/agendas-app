@@ -1,15 +1,22 @@
 # -*- coding: utf-8 -*-
+#from __future__ import unicode_literals
 import urllib2
 import time
 from collections import defaultdict
 from bs4 import BeautifulSoup
 from nltk.text import TextCollection
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+from nltk.stem.snowball import SpanishStemmer
+
+
 
 def extraer_articulos(conicet_id):
     url_art = "http://www.conicet.gov.ar/new_scp/detalle.php?keywords=&id=" + str(conicet_id) + "&articulos=yes"
     response = urllib2.urlopen(url_art)
     html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, 'html.parser', from_encoding='utf-8')
     lista = []
     for link in soup.find_all('a'):
         url = link.get('href')
@@ -37,7 +44,7 @@ def extraer_libros(conicet_id):
     url_art = "http://www.conicet.gov.ar/new_scp/detalle.php?keywords=&id=" + str(conicet_id) + "&libros=yes"
     response = urllib2.urlopen(url_art)
     html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, 'html.parser', from_encoding='utf-8')
     lista = []
     for link in soup.find_all('a'):
         url = link.get('href')
@@ -49,7 +56,7 @@ def extraer_libros(conicet_id):
 def info_libros(url):
     response = urllib2.urlopen(url)
     html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, 'html.parser', from_encoding='utf-8')
     labels = soup.find_all('div', attrs={"class": "contenido_label"})
     info = soup.find_all('div', attrs={"class": "contenido_label_info"})
     if len(labels) != len(info):
@@ -65,7 +72,7 @@ def extraer_capitulos(conicet_id):
     url_art = "http://www.conicet.gov.ar/new_scp/detalle.php?keywords=&id=" + str(conicet_id) + "&capitulos=yes"
     response = urllib2.urlopen(url_art)
     html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, 'html.parser', from_encoding='utf-8')
     lista = []
     for link in soup.find_all('a'):
         url = link.get('href')
@@ -77,7 +84,7 @@ def extraer_capitulos(conicet_id):
 def info_capitulos(url):
     response = urllib2.urlopen(url)
     html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, 'html.parser', from_encoding='utf-8')
     labels = soup.find_all('div', attrs={"class": "contenido_label"})
     info = soup.find_all('div', attrs={"class": "contenido_label_info"})
     if len(labels) != len(info):
@@ -93,7 +100,7 @@ def extraer_congresos(conicet_id):
     url_art = "http://www.conicet.gov.ar/new_scp/detalle.php?keywords=&id=" + str(conicet_id) + "&congresos=yes"
     response = urllib2.urlopen(url_art)
     html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, 'html.parser', from_encoding='utf-8')
     lista = []
     for link in soup.find_all('a'):
         url = link.get('href')
@@ -105,7 +112,7 @@ def extraer_congresos(conicet_id):
 def info_congresos(url):
     response = urllib2.urlopen(url)
     html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, 'html.parser', from_encoding='utf-8')
     labels = soup.find_all('div', attrs={"class": "contenido_label"})
     info = soup.find_all('div', attrs={"class": "contenido_label_info"})
     if len(labels) != len(info):
@@ -121,7 +128,7 @@ def extraer_convenios(conicet_id):
     url_art = "http://www.conicet.gov.ar/new_scp/detalle.php?keywords=&id=" + str(conicet_id) + "&convenios=yes"
     response = urllib2.urlopen(url_art)
     html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, 'html.parser', from_encoding='utf-8')
     lista = []
     for link in soup.find_all('a'):
         url = link.get('href')
@@ -133,7 +140,7 @@ def extraer_convenios(conicet_id):
 def info_convenios(url):
     response = urllib2.urlopen(url)
     html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, 'html.parser', from_encoding='utf-8')
     labels = soup.find_all('div', attrs={"class": "contenido_label"})
     info = soup.find_all('div', attrs={"class": "contenido_label_info"})
     if len(labels) != len(info):
@@ -149,7 +156,7 @@ def extraer_inftec(conicet_id):
     url_art = "http://www.conicet.gov.ar/new_scp/detalle.php?keywords=&id=" + str(conicet_id) + "&inf_tecnico=yes"
     response = urllib2.urlopen(url_art)
     html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, 'html.parser', from_encoding='utf-8')
     lista = []
     for link in soup.find_all('a'):
         url = link.get('href')
@@ -161,7 +168,7 @@ def extraer_inftec(conicet_id):
 def info_inftec(url):
     response = urllib2.urlopen(url)
     html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, 'html.parser', from_encoding='utf-8')
     labels = soup.find_all('div', attrs={"class": "contenido_label"})
     info = soup.find_all('div', attrs={"class": "contenido_label_info"})
     if len(labels) != len(info):
@@ -226,7 +233,7 @@ def transformaroutput(dictlist):
         if i['anio'].endswith(';'):
             i['anio'] = i['anio'][:-1]
         try:
-            output[i['anio']].append(i['Resumen:'])
+            output[i['anio']].append(i[u'Resumen:'])
         except KeyError:
             output[i['anio']].append(i[u'Descripción:'])
         
@@ -236,13 +243,33 @@ def transformaroutput(dictlist):
 def juntarlistas(listas):
     output = {}
     for lista in listas:
-        for i, j in lista.iteritems():
+        for i, j in lista.iteritems(): 
             if i not in output.keys():
                 output[i] = []
             if type(j) is list:
+                print j[0][:25]
                 for k in j:
-                   output[i].append(k)  
+                   output[i].append(k) 
             else:
+                print j[:25]
                 output[i].append(j)
     return output 
+
+def formatofinal(idconicet):
+    dictio = juntarlistas(datos_persona(idconicet))
+    output = {}
+    for k, v in dictio.iteritems():
+        output[int(k)] = ' '.join(v)
+    return output
     
+def preprocess(dictio):
+    output = []
+    for i in dictio.values():
+        tokens = word_tokenize(i)
+        sinsw = [word.lower() for word in tokens if word not in (stopwords.words('spanish') + stopwords.words('english') + stopwords.words('french'))and word.isalpha()]
+        #stemmer = SpanishStemmer()
+        #stemmed = [stemmer.stem(word) for word in sinsw]
+        lemmatizer = WordNetLemmatizer()
+        stemmed = [lemmatizer.lemmatize(word) for word in sinsw]        
+        output.append(stemmed)
+    return output    
